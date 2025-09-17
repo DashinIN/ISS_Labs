@@ -4,3 +4,12 @@
 • 1: телефоны низко-среднего сегмента, <br/>
 • 2: телефоны среднего и высокого сегмента, <br/>
 • 3: премиум телефоны. <br/>
+#  Запуск
+Для запуска проекта необходимо выполнить следующие команды: <br/>
+```
+git clone https://github.com/DashinIN/ISS_Labs.git
+cd IIS-Labs
+python -m venv .venv
+.venv/Scripts/activate
+pip install -r requirements.txt
+```
