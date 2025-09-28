@@ -45,7 +45,6 @@
 ### Синтетические признаки
 
 #### Screen RAM Score
-![Screen RAM Score Correlation](./eda/screen_ram_correlation.png)
 ![Screen-RAM Score Correlation](./eda/screen_ram_correlation.png)
 
 #### Описание признака
