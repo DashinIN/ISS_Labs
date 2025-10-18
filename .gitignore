@@ -1,3 +1,5 @@
 .venv*
 *.pkl
 data
+*.db
+mlartifacts*
