@@ -1,1 +1,1 @@
-['num__px_height', 'num__px_width', 'num__ram', 'quantile__mobile_wt', 'quantile__px_height', 'quantile__px_width', 'quantile__ram', 'poly__battery_power', 'poly__battery_power^2', 'poly__battery_power clock_speed', 'spline__battery_power_sp_1', 'spline__battery_power_sp_3']
+['num__px_height', 'num__px_width', 'num__ram', 'quantile__battery_power', 'quantile__px_height', 'quantile__px_width', 'quantile__ram', 'poly__battery_power', 'poly__battery_power^2', 'poly__battery_power clock_speed', 'spline__battery_power_sp_1', 'spline__battery_power_sp_3']
