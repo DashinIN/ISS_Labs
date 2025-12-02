@@ -1,0 +1,140 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {},
+          "mappings": [],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "id": 1,
+      "options": {
+        "legend": {"displayMode": "list", "placement": "right"},
+        "tooltip": {"mode": "single"}
+      },
+      "targets": [
+        {
+          "expr": "rate(prediction_requests_total[1m])",
+          "legendFormat": "{{status}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Prediction Requests (rate)",
+      "type": "timeseries"
+    },
+
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {
+        "defaults": {"color": {"mode": "palette-classic"}},
+        "overrides": []
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "id": 2,
+      "options": {"legend": {"displayMode": "list", "placement": "right"}},
+      "targets": [
+        {
+          "expr": "rate(prediction_errors_total[1m])",
+          "legendFormat": "error {{status_code}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Prediction Errors (rate)",
+      "type": "timeseries"
+    },
+
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}}},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "id": 3,
+      "options": {"legend": {"displayMode": "list", "placement": "right"}},
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.5, sum(rate(model_prediction_distribution_bucket[1m])) by (le))",
+          "legendFormat": "p50",
+          "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.9, sum(rate(model_prediction_distribution_bucket[1m])) by (le))",
+          "legendFormat": "p90",
+          "refId": "B"
+        },
+        {
+          "expr": "sum(rate(model_prediction_distribution_bucket[1m])) by (le)",
+          "legendFormat": "bucket <= {{le}}",
+          "refId": "C"
+        }
+      ],
+      "title": "Prediction Distribution (Histogram)",
+      "type": "timeseries"
+    },
+
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}}},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "id": 4,
+      "options": {"legend": {"displayMode": "list", "placement": "right"}},
+      "targets": [
+        {
+          "expr": "model_prediction_distribution_count",
+          "legendFormat": "total count",
+          "refId": "A"
+        },
+        {
+          "expr": "model_prediction_distribution_sum",
+          "legendFormat": "sum",
+          "refId": "B"
+        }
+      ],
+      "title": "Prediction Histogram (Count / Sum)",
+      "type": "timeseries"
+    },
+
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "gridPos": {"h": 6, "w": 24, "x": 0, "y": 16},
+      "id": 5,
+      "options": {"reduceOptions": {"calcs": ["last"]}},
+      "targets": [
+        {
+          "expr": "up{job=\"phone-predict\"}",
+          "refId": "A"
+        }
+      ],
+      "title": "Service UP Status",
+      "type": "stat"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 30,
+  "style": "dark",
+  "tags": ["phone-predict"],
+  "timezone": "browser",
+  "title": "Phone Predict Metrics Dashboard",
+  "version": 1
+}
