@@ -185,6 +185,8 @@ my_proj/
 
 **Структура БД:**
 
+[Таблицы](./services/database/db.png)
+
 ```sql
 -- Таблица входных данных
 CREATE TABLE phone_requests (
