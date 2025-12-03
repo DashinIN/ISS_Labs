@@ -106,8 +106,8 @@ my_proj/
 │   │   ├── db_handler.py       # Работа с БД
 │   │   ├── main.py             # Главное приложение FastAPI
 │   │   ├── Dockerfile          # Docker образ
-│   │   ├── requirements.txt     # Python зависимости
-│   │   └── .env                # Переменные окружения (не коммитится)
+│   │   └── requirements.txt     # Python зависимости
+│   │   
 │   ├── requests/               # Тестовый клиент
 │   │   ├── req.py              # Генератор тестовых запросов
 │   │   ├── Dockerfile          # Docker образ
