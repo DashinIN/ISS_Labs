@@ -1,11 +1,36 @@
 # Описание проекта
-Необходимо разработать модель классификации, которая на основе различных характеристик мобильного телефона сможет предсказать его ценовой диапазон (price_range).
+Микросервисное приложение для классификации мобильных телефонов по ценовому диапазону на основе их характеристик. Проект включает полный stack для разработки, тестирования, мониторинга и хранения данных.
 
-Целевой переменной является price_range, которая принимает значения от 0 до 3, где:
-• 0: бюджетные телефоны
-• 1: телефоны низко-среднего сегмента
-• 2: телефоны среднего и высокого сегмента
-• 3: премиум телефоны
+
+### Целевая переменная
+**price_range** — ценовой диапазон телефона (0-3):
+- **0**: бюджетные телефоны
+- **1**: телефоны низко-среднего сегмента
+- **2**: телефоны среднего и высокого сегмента
+- **3**: премиум телефоны
+
+### Используемые технологии и библиотеки
+
+#### Backend & ML:
+- **FastAPI** — асинхронный веб-фреймворк для создания API
+- **scikit-learn** — машинное обучение и предсказания
+- **pandas** — обработка и анализ данных
+- **numpy** — работа с массивами
+- **pickle** — сериализация моделей
+
+#### Контейнеризация:
+- **Docker** — контейнеризация сервисов
+- **Docker Compose** — оркестрация микросервисов
+
+#### Базы данных:
+- **PostgreSQL 15** — хранение входных данных и предсказаний
+- **pgAdmin 4** — веб-интерфейс управления БД
+
+#### Мониторинг и визуализация:
+- **Prometheus** — сбор и хранение метрик
+- **Grafana** — визуализация метрик на дашборде
+- **prometheus-fastapi-instrumentator** — автоматический сбор метрик из FastAPI
+
 
 ## Результаты разведочного анализа (EDA)
 
@@ -66,72 +91,349 @@ pip install -r requirements.txt
 ```
    sh run.sh
 ```
+## Структура проекта
 
-# Создание сервиса
-### 1. Основной API-сервер с FastAPI: <br/>
-
-• Обработка запросов на корневом маршруте (`/`) — возвращает простое сообщение `{'Hello': 'world'}` <br/>
-• Обработка запросов на маршруте `/api/prediction` — принимает идентификатор объекта и его признаки,   использует модель для предсказания и возвращает price_range <br/>
-
-### 2. Обработчик предсказаний модели:<br/>
-
-• При создании экземпляра класса загружает модель из файла `model.pkl` <br/>
-• Логирует успешность загрузки или ошибки. <br/>
-• Метод `predict` принимает словарь с признаками объекта, преобразует его в pandas.DataFrame, подает на вход   модели и возвращает предсказание. <br/>
-
-### 3. Dockerfile для контейнеризации сервиса: <br/>
-Данный файл описывает инструкцию по созданию Docker-образа для запуска FastAPI-сервиса.<br/>
-
-• Копирование всех файлов приложения в контейнер<br/>
-• Установка зависимостей из `requirements.txt`<br/>
-• Указание рабочей директории и порта для запуска<br/>
-• Обеспечение возможности подключения модели через монтируемую папку (`/models`)<br/>
-• Запуск приложения с помощью uvicorn
-
-### 4.  requirements.txt для зависимостей
-Список необходимых Python-библиотек для работы сервиса:<br/>
-
-• fastapi и uvicorn — для создания и запуска веб-сервиса<br/>
-• pandas — для работы с данными<br/>
-• pickle4 — для загрузки сохраненной модели<br/>
-• scikit-learn — для выполнения предсказаний с помощью обученной модели<br/>
-
-### 5. MLFlow
-Для работы с MLflow локально. Он выполняет загрузку модели из хранилища MLflow Tracking Server и сохраняет ее в файл model.pkl для дальнейшего использования. <br/>
-
-Создание образа: <br/>
 ```
-   docker build . --tag estate_model:0
-```
-Запуск контейнера: <br/>
-```
-   docker run -p 8001:8000 -v $(pwd)/../models:/models estate_model:0
+my_proj/
+├── .venv_my_proj/              # Виртуальное окружение Python
+├── .git/                        # Git репозиторий
+├── data/                        # Исходные и очищенные данные
+├── eda/                         # Графики и результаты анализа
+├── research/                    # Ноутбуки и исследования
+├── services/                    # Микросервисы
+│   ├── ml_service/             # Основной ML-сервис
+│   │   ├── api_handler.py      # Обработчик предсказаний
+│   │   ├── db_handler.py       # Работа с БД
+│   │   ├── main.py             # Главное приложение FastAPI
+│   │   ├── Dockerfile          # Docker образ
+│   │   ├── requirements.txt     # Python зависимости
+│   │   └── .env                # Переменные окружения (не коммитится)
+│   ├── requests/               # Тестовый клиент
+│   │   ├── req.py              # Генератор тестовых запросов
+│   │   ├── Dockerfile          # Docker образ
+│   │   └── requirements.txt     # Python зависимости
+│   ├── prometheus/             # Prometheus мониторинг
+│   │   └── prometheus.yml      # Конфигурация Prometheus
+│   ├── grafana/                # Grafana дашборды
+│   │   └── config.json         # Конфиг дашборда
+│   ├── database/               # PostgreSQL данные
+│   │   ├── data/               # Volume для данных PostgreSQL
+│   │   └── pgadmin/            # Volume для pgAdmin
+│   ├── models/                 # Сохраненные модели
+│   │   └── get_model.py        # Загрузка модели
+│   └── compose.yml             # Docker Compose конфигурация
+├── .gitignore 
 ```
 
-### 6. Проверка роботоспособности сервиса
-Подставим в тело запроса одну строку из датафрейма в виде JSON-объекта:
+---
+
+## Микросервисы
+
+### 1. ML Service (`ml_service/`)
+
+**Основной API-сервис на FastAPI для предсказания ценовых диапазонов телефонов.**
+
+**Структура файлов:**
+- `main.py` — главное приложение с маршрутами:
+  - `GET /` — информация о сервисе
+  - `POST /api/prediction` — запрос на предсказание
+  - `GET /metrics` — метрики Prometheus
+  
+- `api_handler.py` — обработчик предсказаний:
+  - Загрузка модели из `model.pkl`
+  - Преобразование входных данных в DataFrame
+  - Возврат предсказания (0-3)
+  
+- `db_handler.py` — работа с PostgreSQL:
+  - Сохранение входных данных в таблицу `phone_requests`
+  - Сохранение предсказаний в таблицу `phone_predictions`
+  
+- `requirements.txt` — зависимости:
+  ```
+   fastapi
+   uvicorn
+   pandas
+   pickle4
+   scikit-learn
+   prometheus_fastapi_instrumentator
+   psycopg2-binary
+   python-multipart
+  ```
+
+---
+
+### 2. Test Requests (`requests/`)
+
+**Тестовый клиент для генерации нагрузки на API.**
+
+**Структура файлов:**
+- `req.py` — генератор 50 случайных запросов:
+  - Создает синтетические данные о телефонах
+  - Отправляет POST запросы на `/api/prediction`
+  - Логирует результаты
+  
+- `requirements.txt` — зависимости:
+  ```
+  requests
+  ```
+
+---
+
+### 3. PostgreSQL Database (`database/`)
+
+**Реляционная БД для хранения данных и предсказаний.**
+
+**Структура БД:**
+
+```sql
+-- Таблица входных данных
+CREATE TABLE phone_requests (
+    id SERIAL PRIMARY KEY,
+    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    battery_power INT,
+    blue INT,
+    clock_speed FLOAT,
+    dual_sim INT,
+    fc INT,
+    four_g INT,
+    int_memory INT,
+    m_dep FLOAT,
+    mobile_wt INT,
+    n_cores INT,
+    pc INT,
+    px_height INT,
+    px_width INT,
+    ram INT,
+    sc_h INT,
+    sc_w INT,
+    talk_time INT,
+    three_g INT,
+    touch_screen INT,
+    wifi INT
+);
+
+-- Таблица предсказаний
+CREATE TABLE phone_predictions (
+    id SERIAL PRIMARY KEY,
+    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    request_id INT REFERENCES phone_requests(id),
+    predicted_price INT
+);
 ```
- {
-    "battery_power": 1434,
-    "blue": 0,
-    "clock_speed": 1.4,
-    "dual_sim": 0,
-    "fc": 11,
+
+**Структура файлов:**
+- `data/` — volume для хранения данных PostgreSQL
+- `pgadmin/` — volume для хранения конфигурации pgAdmin
+
+---
+
+### 4. pgAdmin (`database/pgadmin/`)
+
+**Веб-интерфейс управления PostgreSQL.**
+
+**Доступ:** http://localhost:5050
+
+
+**Возможности:**
+- Просмотр таблиц `phone_requests` и `phone_predictions`
+- Выполнение SQL запросов
+- Анализ данных
+
+---
+
+### 5. Prometheus (`prometheus/`)
+
+**Система мониторинга для сбора метрик сервисов.**
+
+**Структура файлов:**
+- `prometheus.yml` — конфигурация:
+
+**Доступ:** http://localhost:9090
+
+### 6. Grafana (`grafana/`)
+
+**Визуализация метрик на интерактивном дашборде.**
+
+[Дашборд](./services/graphana/dashboard.png)
+
+json дашборда хранится в директории `grafana/`.
+
+**Доступ:** http://localhost:3000
+
+**Дашборд включает панели:**
+
+#### Панель: Request Rate (Infrastructure)
+- **Метрика:** `rate(prediction_requests_total[1m])`
+- **Описание:** Частота HTTP запросов в секунду
+- **Единица:** req/s
+
+#### Панель: Response Time Percentiles (Infrastructure)
+- **Метрика:** `histogram_quantile(0.95, prediction_response_time)`
+- **Описание:** Время ответа (p95, p99)
+- **Единица:** ms
+
+#### Панель: Prediction Success vs Errors (Application)
+- **Метрика:** 
+  - Успешные: `prediction_requests_total{status="success"}`
+  - Ошибки: `prediction_errors_total`
+- **Описание:** Соотношение успешных ответов к ошибкам
+- **Тип:** Pie Chart
+
+#### Панель: Model Prediction Distribution (Model Quality)
+- **Метрика:** `model_prediction_distribution_bucket`
+- **Описание:** Распределение предсказанных ценовых диапазонов (0-3)
+- **Тип:** Histogram
+
+#### Панель: Predictions Count from Database (PostgreSQL)
+- **Запрос:** 
+  ```sql
+  SELECT COUNT(*) as total_predictions FROM phone_predictions;
+  SELECT COUNT(*) as total_requests FROM phone_requests;
+  ```
+- **Описание:** Количество записей в БД
+- **Тип:** Gauge
+
+---
+
+## Запуск проекта
+
+### Предварительные требования:
+- Docker & Docker Compose
+- Python 3.8+
+- Git
+
+### Быстрый старт
+
+#### 1. Клонирование репозитория:
+```bash
+git clone https://github.com/DashinIN/ISS_Labs.git
+cd IIS-Labs
+```
+
+#### 2. Создание виртуального окружения:
+```bash
+python -m venv .venv
+.venv\Scripts\activate  # На Windows
+# или
+source .venv/bin/activate  # На Linux/Mac
+```
+
+#### 3. Установка зависимостей:
+```bash
+pip install -r requirements.txt
+```
+
+#### 4. Запуск Docker Compose: 
+Собрать сервисы, после: 
+```bash
+cd services
+docker compose up -d
+```
+
+## Веб-интерфейсы
+
+| Сервис | URL | Учетные данные |
+|--------|-----|----------------|
+| **API Документация** | http://localhost:8000/docs | — |
+| **Swagger UI** | http://localhost:8000/redoc | — |
+| **Prometheus** | http://localhost:9090 | — |
+| **Grafana** | http://localhost:3000 | admin/admin |
+| **pgAdmin** | http://localhost:5050 | admin@admin.com/admin |
+
+---
+
+## Использование API
+
+### Пример запроса на предсказание:
+
+[Пример запроса](./services/requests/images/req.png)
+
+```bash
+curl -X POST "http://localhost:8000/api/prediction?phone_id=1" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "battery_power": 1500,
+    "blue": 1,
+    "clock_speed": 2.5,
+    "dual_sim": 1,
+    "fc": 15,
     "four_g": 1,
-    "int_memory": 49,
-    "m_dep": 0.5,
-    "mobile_wt": 108,
-    "n_cores": 6,
-    "pc": 18,
-    "px_height": 749,
-    "px_width": 810,
-    "ram": 1773,
-    "sc_h": 15,
-    "sc_w": 8,
-    "talk_time": 7,
+    "int_memory": 32,
+    "m_dep": 0.8,
+    "mobile_wt": 150,
+    "n_cores": 4,
+    "pc": 12,
+    "px_height": 1080,
+    "px_width": 720,
+    "ram": 3000,
+    "sc_h": 16,
+    "sc_w": 9,
+    "talk_time": 10,
     "three_g": 1,
-    "touch_screen": 0,
+    "touch_screen": 1,
     "wifi": 1
+  }'
+```
+
+### Ответ:
+```json
+{
+  "price": 2,
+  "phone_id": 1
 }
 ```
-Сервис должен возвращать значение price_range от 0 до 3 и тем самым мы понимаем к какому ценовому сегменту относится данный телефон.
+
+---
+
+## Запуск MLFlow (опционально)
+
+```bash
+cd mlflow/
+sh run.sh
+```
+
+Сервер MLFlow будет доступен на http://localhost:5000
+
+---
+
+
+## Структура запросов в тестовом клиенте
+
+Тестовый скрипт генерирует 50 запросов со следующей структурой:
+
+```python
+data = {
+    "battery_power": randint(500, 1999),      # Емкость батареи мАч
+    "blue": randint(0, 1),                    # Наличие Bluetooth
+    "clock_speed": uniform(0.5, 3.0),         # Частота процессора ГГц
+    "dual_sim": randint(0, 1),                # Наличие двух SIM карт
+    "fc": randint(0, 19),                     # Фронтальная камера МПикс
+    "four_g": randint(0, 1),                  # Наличие 4G
+    "int_memory": randint(2, 64),             # Встроенная память ГБ
+    "m_dep": uniform(0.1, 1.0),               # Толщина мм
+    "mobile_wt": randint(80, 200),            # Вес граммов
+    "n_cores": randint(1, 8),                 # Количество ядер
+    "pc": randint(0, 20),                     # Основная камера МПикс
+    "px_height": randint(0, 1907),            # Разрешение высота пиксели
+    "px_width": randint(501, 1988),           # Разрешение ширина пиксели
+    "ram": randint(263, 3989),                # ОЗУ МБ
+    "sc_h": randint(5, 19),                   # Размер экрана высота см
+    "sc_w": randint(0, 18),                   # Размер экрана ширина см
+    "talk_time": randint(2, 20),              # Время разговора часы
+    "three_g": randint(0, 1),                 # Наличие 3G
+    "touch_screen": randint(0, 1),            # Сенсорный экран
+    "wifi": randint(0, 1)                     # Наличие WiFi
+}
+```
+
+---
+
+## Лицензия
+
+MIT License
+
+---
+
+## Контакты
+
+Проект создан в рамках лабораторных работ по ИИС.
